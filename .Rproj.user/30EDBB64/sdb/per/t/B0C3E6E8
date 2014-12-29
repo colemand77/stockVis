@@ -1,0 +1,17 @@
+{
+    "contents" : "library(quantmod)\nlibrary(dplyr)\nlibrary(ggvis)\nlibrary(tidyr)\nlibrary(devtools)\n\n\nticka <- \"XOM\"\n\nstart <- as.Date(\"2000-01-01\")\nend <- as.Date(\"2014-12-22\")\nper <- \"days\"\nwindow <- 60\n\n#pull the data from the web\n\npx_a <-getSymbols(ticka, src = \"yahoo\", \n           from = start,\n           to = end,\n           auto.assign = FALSE)\n\npx_b <- oil[!is.na(oil[,1])]\n\nhead(px_a)\nhead(px_b)\nindex(px_a)\n\n  #getSymbols(tickb, src = \"yahoo\", \n   #               from = start,\n    #              to = end,\n     #             auto.assign = FALSE)\n\noil<-getSymbols('DCOILWTICO',src='FRED',\n           from = start,\n           to = end,\n           auto.assign = FALSE) \n\npx_b <- oil[!is.na(oil[,1])]\nhead(px_b)\nnames(px_b)<-c(\"oil.Adjusted\")\n\n\ndummy <- merge(px_b, px_a, join='inner')\nhead(dummy)\ndummy_df<-data.frame(date=as.Date(index(dummy),\"%Y-%m-%d\"),dummy, row.names = NULL)\nhead(dummy_df)\n\ndummy_zoo<-as.zoo(as.matrix(dummy_df[,-1]), as.Date(dummy_df[,1]))\nhead(dummy_zoo)\n\n#next step is to get it in the right periodicity - before join the tables\n#can only handle OHLC data (FUCKING WHY!!)\n#and join in the same step\n\npx_2<-merge(to.period(px_a,\n                      period = per),\n            to.period(px_b,\n                       period = per,\n                      name=c(\"open\",\"high\",\"low\",\"oil.Adjusted\")),  \n            join='inner')\nnames(px_2)\n#can then conver to a data frame to extract just the correct columns\nclean_px<-  data.frame(date=index(px_2),px_2, row.names = NULL) %>%\n  select(date,contains(\".Adjusted\")) %>%\n  mutate(a_delt = (.[,2]-lag(.[,2]))/lag(.[,2])) %>%\n  mutate(b_delt = (.[,3]-lag(.[,3]))/lag(.[,3])) %>%\n  filter(!is.na(a_delt) & !is.na(b_delt))\n\n\nclean_zoo<- as.zoo(as.matrix(clean_px[,-1]), as.Date(clean_px[,1]))\nclean_zoo\nrm(rollcoeff)\nrollcoeff <-  rollapply(clean_zoo, width=window,\n            FUN = function(z) {\n              as.numeric(coef(lm(a_delt ~ b_delt, data = as.data.frame(z))))},\n            by.column = FALSE,\n            fill = NA,\n            align=\"right\",\n            partial = FALSE) %>%\n  data.frame(date = index(.),coredata(.))\n\n#this works!!!\n#px %>%\n#  select(date,contains(\".Adjusted\")) %>%\n#  mutate_each(funs( . / lag(.) -1),-date)\n\n\nglimpse(rollcoeff)\n\n\nrollcoeff %>%\n  ggvis(~date,~X2) %>%\n  layer_lines(stroke:=\"blue\")\n",
+    "created" : 1419027226931.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2776559314",
+    "id" : "B0C3E6E8",
+    "lastKnownWriteTime" : 1419882848,
+    "path" : "~/R_Projects/stockVis/backup.R",
+    "project_path" : "backup.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

@@ -1,0 +1,17 @@
+{
+    "contents" : "trims <- c(0, 0.1, 0.2, 0.5)\nx <-rcauchy(100)\n\nlapply(trims, function (trim) mean(x, trim = trim))\nlapply(trims, mean, x=x)\n\nformulas <-list(\n  mpg ~ disp,\n  mpg ~ I(1 / disp),\n  mpg ~ disp + wt,\n  mpg ~ I(1 / disp) + wt)\n\nformulas\nlm(mpg~disp, data=mtcars)\n\nlapply(formulas, FUN = function(x) lm(x,data=mtcars))\n\nmodels <- c()\nfor (n in formulas) {\n  print(n)\n  models <- c(models,lm(n, data=mtcars))\n}\nmodels\n\n\nbootstraps <- lapply(1:10, function(i){\n  rows <- sample(1:nrow(mtcars), rep=TRUE)\n  mtcars[rows, ]\n})\nbootstraps\n\n#using lapply\nlapply(bootstraps,FUN=function(x) lm(mpg~disp, data=x))\n\n#using loop\nout <- vector(\"list\",length(bootstraps))\nfor (i in seq_along(bootstraps)){\n  out[[i]]<-lm(mpg~disp,data=bootstraps[[i]])\n}\nout\n",
+    "created" : 1419268487234.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "966212277",
+    "id" : "9AF4D4C7",
+    "lastKnownWriteTime" : 1419275639,
+    "path" : "~/R_Projects/stockVis/looping_help.R",
+    "project_path" : "looping_help.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

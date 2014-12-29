@@ -1,0 +1,16 @@
+{
+    "contents" : "library(shiny)\nlibrary(ggvis)\n\n\nshinyUI(fluidPage(\n  titlePanel(\"Rolling Stock Return Correlation vs WTI\"),\n  \n  sidebarLayout(\n    sidebarPanel(\n      helpText(\"Select a stock to examine. \n        Returns calculated based on Adjusted Close from yahoo finance.\"),\n    \n      textInput(\"symb\", \"Symbol\", \"SPY\"),\n\n    \n      dateRangeInput(\"dates\", \n        \"Date range\",\n        start = \"2013-01-01\", \n        end = as.character(Sys.Date())),\n   \n      actionButton(\"getstock\", \"Get Stock\"),\n      \n      br(),\n      helpText(\"Kyle is so, so gay\"),\n      \n      br(),\n      selectInput(\"per\",\"Periodicity:\",c(\"days\",\"weeks\",\"months\")),\n      \n      br(),      \n      sliderInput(\"window\",label = (\"length of regression window\"),\n                  min = 5, max = 900, value = 60)\n      \n    ),\n    \n    mainPanel(\n      plotOutput(\"line\"),\n      br(),\n      ggvisOutput(\"ggscatter\"),\n      br(),\n      #plotOutput(\"scatter\"),\n      #br(),\n      tableOutput(\"scatterTable\")\n      )\n  )\n))",
+    "created" : 1419022349212.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1481849939",
+    "id" : "83E3F033",
+    "lastKnownWriteTime" : 1419800850,
+    "path" : "~/R_Projects/stockVis/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
